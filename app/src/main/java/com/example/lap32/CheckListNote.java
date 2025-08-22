@@ -12,9 +12,14 @@ public class CheckListNote extends Note {
         this.items = items;
     }
 
+    // ADD THIS METHOD
+    public List<String> getItems() {
+        return items;
+    }
+
     @Override
     public String display() {
-        // ปรับปรุง: ส่งคืน String ที่จัดรูปแบบและสร้างรายการตรวจสอบ
+        // ... existing display method
         StringBuilder itemsStr = new StringBuilder();
         for (String item : items) {
             itemsStr.append("- ").append(item).append("\n");

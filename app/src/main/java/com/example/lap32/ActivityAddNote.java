@@ -1,7 +1,7 @@
 package com.example.lap32;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +16,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+
 
 public class ActivityAddNote extends AppCompatActivity {
 
+    // ... your existing fields ...
     private Spinner spinnerUser;
     private TextView tvResult;
     private List<BaseUser> userList;
@@ -32,7 +37,7 @@ public class ActivityAddNote extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // ... (โค้ด Boilerplate) ...
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_note);
@@ -41,8 +46,6 @@ public class ActivityAddNote extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-
         // 1. ค้นหา Views
         initializeViews();
 
@@ -51,9 +54,8 @@ public class ActivityAddNote extends AppCompatActivity {
         populateUserSpinner();
 
         // 3. ตั้งค่า Listener สำหรับปุ่มบันทึก
-        btnSaveNote.setOnClickListener(v -> saveNote());
+        btnSaveNote.setOnClickListener(v -> saveNote()); // 'v' here is the Button view that was clicked
 
-        // ... (Listener อื่นๆ) ...
     }
 
     private void initializeViews() {
@@ -114,5 +116,16 @@ public class ActivityAddNote extends AppCompatActivity {
         // --- แสดงผลลัพธ์: ซึ่งตอนนี้จะมีข้อมูล User รวมอยู่ด้วย ---
         tvResult.setText(newNote.display());
         Toast.makeText(this, "Note saved!", Toast.LENGTH_SHORT).show();
+
+        NoteEntity entity = NoteMapper.toEntity(newNote);
+
+        // Option 1: Use 'this' as the Context (since Activity is a Context)
+        Context context = this;
+        // Option 2: Use getApplicationContext()
+        // Context context = getApplicationContext();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            AppDatabase.getInstance(context).noteDao().insert(entity);
+        });
     }
 }
