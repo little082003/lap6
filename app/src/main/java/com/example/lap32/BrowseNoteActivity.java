@@ -12,12 +12,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class BrowseNoteActivity extends AppCompatActivity {
 
     private ProgressBar progress;
-    private TextView tvResult;
+    private TextView tvResult,showNoteFromAPI;
     private Button btnSearch;
 
 
@@ -36,6 +43,7 @@ public class BrowseNoteActivity extends AppCompatActivity {
         progress = findViewById(R.id.progressBar1);
         tvResult = findViewById(R.id.tvResult);
         btnSearch = findViewById(R.id.btnSearch);
+        showNoteFromAPI = findViewById(R.id.showAPI);
 
         // ซ่อน ProgressBar และ TextView ผลลัพธ์ในตอนเริ่มต้น
         progress.setVisibility(View.GONE);
@@ -76,6 +84,37 @@ public class BrowseNoteActivity extends AppCompatActivity {
                     });
                 }).start(); // สั่งให้ Thread เริ่มทำงาน
             }
+        });
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://jsonplaceholder.typicode.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+        Call<List<TextNote>> call = apiService.getTextNote();
+
+        call.enqueue(new Callback<List<TextNote>>() {
+            @Override
+            public void onResponse(Call<List<TextNote>> call, Response<List<TextNote>> response) {
+                if (!response.isSuccessful()) {
+                    showNoteFromAPI.setText("Error Code: " + response.code());
+                    return;
+                }
+
+                List<TextNote> notes = response.body();
+                StringBuilder builder = new StringBuilder();
+                for (TextNote n : notes) {
+                    builder.append("Title: ").append(n.title).append("\n")
+                            .append("Body: ").append(n.context).append("\n\n");
+                }
+                showNoteFromAPI.setText(builder.toString());
+            }
+
+            @Override
+            public void onFailure(Call<List<TextNote>> call, Throwable t) {
+                showNoteFromAPI.setText("Failed: " + t.getMessage());
+            }
+
         });
     }
 }

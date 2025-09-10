@@ -1,14 +1,20 @@
 package com.example.lap32;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public abstract class Note {
     protected String title;
+    @SerializedName("body")
     protected String context;
+    //protected String context;
     protected Date createdDate;
     protected BaseUser owner; // เพิ่ม: field สำหรับเก็บข้อมูลเจ้าของ
+
+
 
     // ปรับปรุง: เพิ่ม BaseUser ในคอนสตรัคเตอร์
     public Note(String title, String context, BaseUser owner) {

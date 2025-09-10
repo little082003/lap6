@@ -39,6 +39,9 @@ dependencies {
     implementation(libs.gson)
     annotationProcessor(libs.room.compiler)
 
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
